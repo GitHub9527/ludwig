@@ -374,7 +374,6 @@ class ParallelCNN(object):
                    (which does not reduce and returns the full tensor).
             :type reduce_output: str
         """
-        self.should_embed = should_embed
 
         if conv_layers is not None and num_conv_layers is None:
             # use custom-defined layers
@@ -418,17 +417,20 @@ class ParallelCNN(object):
 
         self.reduce_output = reduce_output
 
-        self.embed_sequence = EmbedSequence(
-            vocab,
-            embedding_size,
-            representation=representation,
-            embeddings_trainable=embeddings_trainable,
-            pretrained_embeddings=pretrained_embeddings,
-            embeddings_on_cpu=embeddings_on_cpu,
-            dropout=dropout,
-            initializer=initializer,
-            regularize=regularize
-        )
+        self.should_embed = should_embed
+        self.embed_sequence = None
+        if self.should_embed:
+            self.embed_sequence = EmbedSequence(
+                vocab,
+                embedding_size,
+                representation=representation,
+                embeddings_trainable=embeddings_trainable,
+                pretrained_embeddings=pretrained_embeddings,
+                embeddings_on_cpu=embeddings_on_cpu,
+                dropout=dropout,
+                initializer=initializer,
+                regularize=regularize
+            )
 
         self.parallel_conv_1d = ParallelConv1D(
             layers=self.conv_layers,
@@ -754,20 +756,22 @@ class StackedCNN:
             raise ValueError(
                 'Invalid layer parametrization, use either fc_layers or num_fc_layers')
 
-        self.should_embed = should_embed
         self.reduce_output = reduce_output
 
-        self.embed_sequence = EmbedSequence(
-            vocab,
-            embedding_size,
-            representation=representation,
-            embeddings_trainable=embeddings_trainable,
-            pretrained_embeddings=pretrained_embeddings,
-            embeddings_on_cpu=embeddings_on_cpu,
-            dropout=dropout,
-            initializer=initializer,
-            regularize=regularize
-        )
+        self.should_embed = should_embed
+        self.embed_sequence = None
+        if self.should_embed:
+            self.embed_sequence = EmbedSequence(
+                vocab,
+                embedding_size,
+                representation=representation,
+                embeddings_trainable=embeddings_trainable,
+                pretrained_embeddings=pretrained_embeddings,
+                embeddings_on_cpu=embeddings_on_cpu,
+                dropout=dropout,
+                initializer=initializer,
+                regularize=regularize
+            )
 
         self.conv_stack_1d = ConvStack1D(
             layers=self.conv_layers,
@@ -1088,20 +1092,22 @@ class StackedParallelCNN:
             raise ValueError(
                 'Invalid layer parametrization, use either fc_layers or num_fc_layers')
 
-        self.should_embed = should_embed
         self.reduce_output = reduce_output
 
-        self.embed_sequence = EmbedSequence(
-            vocab,
-            embedding_size,
-            representation=representation,
-            embeddings_trainable=embeddings_trainable,
-            pretrained_embeddings=pretrained_embeddings,
-            embeddings_on_cpu=embeddings_on_cpu,
-            dropout=dropout,
-            initializer=initializer,
-            regularize=regularize
-        )
+        self.should_embed = should_embed
+        self.embed_sequence = None
+        if self.should_embed:
+            self.embed_sequence = EmbedSequence(
+                vocab,
+                embedding_size,
+                representation=representation,
+                embeddings_trainable=embeddings_trainable,
+                pretrained_embeddings=pretrained_embeddings,
+                embeddings_on_cpu=embeddings_on_cpu,
+                dropout=dropout,
+                initializer=initializer,
+                regularize=regularize
+            )
 
         self.stack_parallel_conv_1d = StackParallelConv1D(
             stacked_layers=self.stacked_layers,
