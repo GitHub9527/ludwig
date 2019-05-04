@@ -19,8 +19,13 @@ import tensorflow as tf
 
 from ludwig.models.modules.image_encoders import Stacked2DCNN, ResNetEncoder
 from ludwig.models.modules.sequence_encoders import EmbedEncoder
+from ludwig.models.modules.sequence_encoders import ParallelCNN
+from ludwig.models.modules.sequence_encoders import StackedCNN
+from ludwig.models.modules.sequence_encoders import StackedParallelCNN
+from ludwig.models.modules.sequence_encoders import RNN
+from ludwig.models.modules.sequence_encoders import CNNRNN
 from ludwig.models.modules.loss_modules import regularizer_registry
-from ludwig.data.dataset_synthesyzer import build_vocab, generate_text
+from ludwig.data.dataset_synthesyzer import build_vocab
 
 
 L1_REGULARIZER = regularizer_registry['l1'](0.1)
@@ -236,3 +241,63 @@ def test_sequence_encoder_embed():
             assert embed.embeddings_trainable == trainable
             assert embed.regularize is True
             assert embed.dropout is False
+
+
+def test_sequence_encoders():
+    num_sentences = 4
+    embedding_size = 5
+    max_len = 7
+    fc_size = 3
+
+    # Generate data
+    text, vocab = generate_random_sentences(
+        num_sentences=num_sentences,
+        max_len=max_len,
+    )
+
+    encoder_args = {
+        'embedding_size': embedding_size,
+        'vocab': vocab,
+        'fc_size': fc_size,
+        'num_fc_layers': 1,
+        'filter_size': 3,
+        'num_filters': 8,
+        'state_size': fc_size
+    }
+
+    # Different values for reduce_output and the corresponding expected size
+    # Figure out the output size for parallel 1d conv
+    reduce_outputs = ['sum', 'max']
+    output_shapes = [
+        [num_sentences, fc_size],
+        [num_sentences, fc_size],
+        [num_sentences, max_len, fc_size]
+    ]
+
+    for reduce_output, output_shape in zip(reduce_outputs, output_shapes):
+        for trainable in [True, False]:
+            for encoder_type in [ParallelCNN,
+                                 StackedCNN,
+                                 StackedParallelCNN,
+                                 RNN,
+                                 CNNRNN]:
+
+                encoder_args['reduce_output'] = reduce_output
+                encoder_args['embeddings_trainable'] = trainable
+                encoder = create_encoder(encoder_type, encoder_args)
+
+                encoder_test(
+                    encoder=encoder,
+                    input_data=text,
+                    regularizer=L1_REGULARIZER,
+                    dropout_rate=DROPOUT_RATE,
+                    output_dtype=np.float,
+                    output_shape=output_shape,
+                    output_data=None
+                )
+
+                embed = encoder.embed_sequence.embed
+                assert embed.representation == 'dense'
+                assert embed.embeddings_trainable == trainable
+                assert embed.regularize is True
+                assert embed.dropout is False

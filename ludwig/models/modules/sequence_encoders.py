@@ -396,27 +396,15 @@ class ParallelCNN(object):
             raise ValueError(
                 'Invalid layer parametrization, use either conv_layers or num_conv_layers')
 
-        if fc_layers is not None and num_fc_layers is None:
-            # use custom-defined layers
-            fc_layers = fc_layers
-            num_fc_layers = len(fc_layers)
-        elif fc_layers is None and num_fc_layers is not None:
-            # generate num_fc_layers with default parameters
-            fc_layers = None
-            num_fc_layers = num_fc_layers
-        elif fc_layers is None and num_fc_layers is None:
+        if fc_layers is None and num_fc_layers is None:
             # use default layers with varying filter sizes
             fc_layers = [
                 {'fc_size': 512},
                 {'fc_size': 256}
             ]
             num_fc_layers = 2
-        else:
-            raise ValueError(
-                'Invalid layer parametrization, use either fc_layers or num_fc_layers')
 
         self.reduce_output = reduce_output
-
         self.should_embed = should_embed
         self.embed_sequence = None
         if self.should_embed:
@@ -737,27 +725,15 @@ class StackedCNN:
             raise ValueError(
                 'Invalid layer parametrization, use either conv_layers or num_conv_layers')
 
-        if fc_layers is not None and num_fc_layers is None:
-            # use custom-defined layers
-            fc_layers = fc_layers
-            num_fc_layers = len(fc_layers)
-        elif fc_layers is None and num_fc_layers is not None:
-            # generate num_fc_layers with default parameters
-            fc_layers = None
-            num_fc_layers = num_fc_layers
-        elif fc_layers is None and num_fc_layers is None:
+        if fc_layers is None and num_fc_layers is None:
             # use default layers with varying filter sizes
             fc_layers = [
                 {'fc_size': 512},
                 {'fc_size': 256}
             ]
             num_fc_layers = 2
-        else:
-            raise ValueError(
-                'Invalid layer parametrization, use either fc_layers or num_fc_layers')
 
         self.reduce_output = reduce_output
-
         self.should_embed = should_embed
         self.embed_sequence = None
         if self.should_embed:
@@ -1073,27 +1049,15 @@ class StackedParallelCNN:
             raise ValueError(
                 'Invalid layer parametrization, use either stacked_layers or num_stacked_layers')
 
-        if fc_layers is not None and num_fc_layers is None:
-            # use custom-defined layers
-            fc_layers = fc_layers
-            num_fc_layers = len(fc_layers)
-        elif fc_layers is None and num_fc_layers is not None:
-            # generate num_fc_layers with default parameters
-            fc_layers = None
-            num_fc_layers = num_fc_layers
-        elif fc_layers is None and num_fc_layers is None:
+        if fc_layers is None and num_fc_layers is None:
             # use default layers with varying filter sizes
             fc_layers = [
                 {'fc_size': 512},
                 {'fc_size': 256}
             ]
             num_fc_layers = 2
-        else:
-            raise ValueError(
-                'Invalid layer parametrization, use either fc_layers or num_fc_layers')
 
         self.reduce_output = reduce_output
-
         self.should_embed = should_embed
         self.embed_sequence = None
         if self.should_embed:
